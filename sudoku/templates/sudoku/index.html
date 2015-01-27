@@ -1,10 +1,14 @@
+{% load staticfiles %}
 <!DOCTYPE html>
 <html lang="en-US">
 	<head>
 		<title>Sudoku</title>
+		<link rel="stylesheet" type="text/css" href="{% static 'sudoku/style.css' %}">
+		<script type="text/javascript" src="{% static 'sudoku/js/jquery-2.1.3.min.js' %} "></script>
+		<script type="text/javascript" src="{% static 'sudoku/js/function.js' %} "></script>
 	</head>
 	<body>
-		<canvas id="myCanvas" width="200" height="100" style="border:1px solid #000000;">
+		<canvas id="myCanvas" width="700" height="630">
 		</canvas>
 	</body>
 </html>
