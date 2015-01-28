@@ -8,7 +8,19 @@
 		<script type="text/javascript" src="{% static 'sudoku/js/function.js' %} "></script>
 	</head>
 	<body>
-		<canvas id="myCanvas" width="700" height="630">
-		</canvas>
+		<div id="container">
+			<div id="title" class="center">
+				<p>输入难度1-20生成数独</p>
+			</div>
+			<div id="hard" class="center">
+				<input id="hardInput" type="text" />
+				<button id="generate" type="button">生成</button>
+			</div>
+			<canvas id="myCanvas" width="630" height="630">
+			</canvas>
+			<div class="center">
+				<button id="solve" class="center">提交答案！</button>
+			</div>
+		</div>
 	</body>
 </html>

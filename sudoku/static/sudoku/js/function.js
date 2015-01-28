@@ -30,27 +30,39 @@ $(document).ready(function() {
 		drawLine(context, 0, i * 69, 621, i * 69);
 		drawLine(context, i * 69, 0, i * 69, 621);
 	}
-
-	$.get("./puzzle/",function(puzzle) {
-		originalSudoku = puzzle;
-		modifiedSudoku = new String(puzzle);
-		for(i = 0; i < 9; i++) {
-			for(j = 0; j < 9; j++) {
-				var number = puzzle.charAt(i * 9 + j);
-				rows[i][j] = number;
-				columns[j][i] = number;
-				blocks[parseInt(i / 3) * 3 + parseInt(j / 3)][i % 3 * 3 + j % 3] = number;
-			}
+	$("#generate").click(function() {
+		var input = parseInt($("#hardInput").val());
+		if(isNaN(input) || input <= 0 || input > 20) {
+			alert("invalid input");
+			return;
 		}
-		drawMap(context, originalSudoku);
+		$.get("./puzzle/" + input,function(puzzle) {
+			originalSudoku = puzzle;
+			modifiedSudoku = new String(puzzle);
+			for(i = 0; i < 9; i++) {
+				for(j = 0; j < 9; j++) {
+					var number = puzzle.charAt(i * 9 + j);
+					rows[i][j] = number;
+					columns[j][i] = number;
+					blocks[parseInt(i / 3) * 3 + parseInt(j / 3)][i % 3 * 3 + j % 3] = number;
+				}
+			}
+			drawMap(context, originalSudoku);
+		});
 	});
 
-	canvas.addEventListener('click', function(evt) {
+	$('#myCanvas').click(function(evt) {
 		var mousePos = getMousePos(canvas, evt);
 		highlightPositon(context, parsePostion(mousePos.x, mousePos.y));
-	}, false);
+	});
 
-	document.addEventListener('keypress' ,function(evt) {
+	$('#solve').click(function() {
+		$.get("./solve/" + modifiedSudoku,function(response) {
+			alert(response);
+		})
+	});
+
+	$(document).keypress(function(evt) {
 		if(currentPostion != null && originalSudoku.charAt(currentPostion) == '.') {
 			var inputNumber = String.fromCharCode(evt.charCode);
 			if(!isNaN(inputNumber) && parseInt(inputNumber) >= 1 && parseInt(inputNumber) <= 9) {
@@ -61,14 +73,14 @@ $(document).ready(function() {
 				var blockPosition = $.inArray(inputNumber, blocks[parseInt(coordinate.row / 3) * 3 + parseInt(coordinate.column / 3)]);
 				var textColor = "#FFFFFF";
 				if(rowPosition != -1 || columnPosition != -1 || blockPosition != -1) {
-					invalidPositions[currentPostion] = -1;
+					// invalidPositions[currentPostion] = -1;
 				}
 				if(rowPosition != -1) {
-					invalidPositions[coordinate.row * 9 + rowPosition] = -1;
+					// invalidPositions[coordinate.row * 9 + rowPosition] = -1;
 					textColor = "#FF0000";
 				} 
 				if(columnPosition != -1) {
-					invalidPositions[columnPosition * 9 + coordinate.column] = -1;
+					// invalidPositions[columnPosition * 9 + coordinate.column] = -1;
 					textColor = "#FF0000";
 				} 
 				
@@ -83,7 +95,7 @@ $(document).ready(function() {
 				// drawNumber(context, currentPostion, inputNumber, textColor);
 			}
 		}
-	}, false);
+	});
 });
 
 function drawMap(context, sudoku, highlightNumber) {

@@ -188,11 +188,18 @@ grid2  = '4.....8.5.3..........7......2.....6.....8.4......1.......6.3.7.5..2...
 hard1  = '.....6....59.....82....8....45........3........6..3.54...325..6..................'
     
 if __name__ == '__main__':
-    test()
-    solve_all(from_file("easy50.txt", '========'), "easy", None)
-    solve_all(from_file("top95.txt"), "hard", None)
-    solve_all(from_file("hardest.txt"), "hardest", None)
-    solve_all([random_puzzle() for _ in range(99)], "random", 100.0)
+    # test()
+    # solve_all(from_file("easy50.txt", '========'), "easy", None)
+    # solve_all(from_file("top95.txt"), "hard", None)
+    # solve_all(from_file("hardest.txt"), "hardest", None)
+    # solve_all([random_puzzle() for _ in range(99)], "random", 100.0)
+    try :
+        if(solved(random_puzzle())):
+            print("good")
+        else:
+            print("hell")
+    except TypeError:
+        print("invalid")
 
 ## References used:
 ## http://www.scanraid.com/BasicStrategies.htm
