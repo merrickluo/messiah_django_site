@@ -36,7 +36,7 @@ $(document).ready(function() {
 			alert("invalid input");
 			return;
 		}
-		$.get("./puzzle/" + input,function(puzzle) {
+		$.get("./puzzle/" + input + "/",function(puzzle) {
 			originalSudoku = puzzle;
 			modifiedSudoku = new String(puzzle);
 			for(i = 0; i < 9; i++) {
@@ -57,7 +57,7 @@ $(document).ready(function() {
 	});
 
 	$('#solve').click(function() {
-		$.get("./solve/" + modifiedSudoku,function(response) {
+		$.get("./solve/" + modifiedSudoku + "/",function(response) {
 			alert(response);
 		})
 	});
