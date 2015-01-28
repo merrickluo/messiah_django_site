@@ -8,5 +8,5 @@ def index(request):
     return render(request,'sudoku/index.html')
 
 def puzzle(request):
-	result = random_puzzle(40);
+	result = random_puzzle(35);
 	return HttpResponse(result);

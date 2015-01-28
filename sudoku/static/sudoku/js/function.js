@@ -1,9 +1,15 @@
 var currentPostion;
-var sudokuData;
+var originalSudoku;
 var modifiedSudoku;
 
+var blocks = createArray(9,9);
+var rows = createArray(9,9);
+var columns = createArray(9,9);
+
+var invalidPositions = createArray(81);
+
 String.prototype.setCharAt = function(idx, chr) {
-	if(idx> this.length - 1){
+	if(idx > this.length - 1){
 		return this.toString();
 	} else {
 		return this.substr(0, idx) + chr + this.substr(idx + 1);
@@ -26,12 +32,17 @@ $(document).ready(function() {
 	}
 
 	$.get("./puzzle/",function(puzzle) {
-		sudokuData = puzzle;
+		originalSudoku = puzzle;
 		modifiedSudoku = new String(puzzle);
-		for(i = 0; i < 81; i++) {
-			var number = puzzle.charAt(i)
-			drawNumber(context, i, number, "#0000CC");
+		for(i = 0; i < 9; i++) {
+			for(j = 0; j < 9; j++) {
+				var number = puzzle.charAt(i * 9 + j);
+				rows[i][j] = number;
+				columns[j][i] = number;
+				blocks[parseInt(i / 3) * 3 + parseInt(j / 3)][i % 3 * 3 + j % 3] = number;
+			}
 		}
+		drawMap(context, originalSudoku);
 	});
 
 	canvas.addEventListener('click', function(evt) {
@@ -40,37 +51,79 @@ $(document).ready(function() {
 	}, false);
 
 	document.addEventListener('keypress' ,function(evt) {
-		if(currentPostion != null && sudokuData.charAt(currentPostion) == '.') {
+		if(currentPostion != null && originalSudoku.charAt(currentPostion) == '.') {
 			var inputNumber = String.fromCharCode(evt.charCode);
 			if(!isNaN(inputNumber) && parseInt(inputNumber) >= 1 && parseInt(inputNumber) <= 9) {
+				var coordinate = getCoordinateByPositon(currentPostion);
+
+				var rowPosition = $.inArray(inputNumber, rows[coordinate.row]);
+				var columnPosition = $.inArray(inputNumber, columns[coordinate.column]);
+				var blockPosition = $.inArray(inputNumber, blocks[parseInt(coordinate.row / 3) * 3 + parseInt(coordinate.column / 3)]);
+				var textColor = "#FFFFFF";
+				if(rowPosition != -1 || columnPosition != -1 || blockPosition != -1) {
+					invalidPositions[currentPostion] = -1;
+				}
+				if(rowPosition != -1) {
+					invalidPositions[coordinate.row * 9 + rowPosition] = -1;
+					textColor = "#FF0000";
+				} 
+				if(columnPosition != -1) {
+					invalidPositions[columnPosition * 9 + coordinate.column] = -1;
+					textColor = "#FF0000";
+				} 
+				
+				if(blockPosition != -1) {
+					// invalidPositions[invalidPositions.length] = 0;
+					textColor = "#FF0000";
+				}
+
 				modifiedSudoku = modifiedSudoku.setCharAt(currentPostion, inputNumber);
-				drawBackground(context, currentPostion, "#FFFFCC");
-				drawNumber(context, currentPostion, inputNumber);
+				drawMap(context, modifiedSudoku, inputNumber);
+				// drawBackground(context, currentPostion, "#FFFFCC");
+				// drawNumber(context, currentPostion, inputNumber, textColor);
 			}
 		}
 	}, false);
 });
 
-function getTextColorByPositon(position) {
-	return sudokuData.charAt(currentPostion) == modifiedSudoku.charAt(currentPostion) ?	"#0000CC" : "#000000";
+function drawMap(context, sudoku, highlightNumber) {
+	for(i = 0; i < 81; i++) {
+		var number = sudoku.charAt(i);
+		var backgroundColor = typeof highlightNumber !== 'undefined' && highlightNumber != "." &&
+		    highlightNumber == number ? "#FFFFCC" : "#ffffff";
+		var textColor = invalidPositions[i] == -1 ? "#FF0000" : number == originalSudoku.charAt(i) ? "#0000CC" : "#000000";
+		drawBackground(context, i, backgroundColor);
+		drawNumber(context, i, number, textColor);
+	}
 }
 
-function unHighlightPositon(context, position) {
-	drawBackground(context, currentPostion, "#ffffff");
-	drawNumber(context, currentPostion, 
-		modifiedSudoku.charAt(currentPostion),
-		getTextColorByPositon(position));
+function createArray(length) {
+    var arr = new Array(length || 0),
+        i = length;
+
+    if (arguments.length > 1) {
+        var args = Array.prototype.slice.call(arguments, 1);
+        while(i--) arr[length-1 - i] = createArray.apply(this, args);
+    }
+
+    return arr;
+}
+
+function getTextColorByPositon(position) {
+	return originalSudoku.charAt(currentPostion) == modifiedSudoku.charAt(currentPostion) ?	"#0000CC" : "#000000";
 }
 
 function highlightPositon(context, position) {
-	if(currentPostion != null) {
-		unHighlightPositon(context, position);
-	}
 	currentPostion = position;
+
+	var selectedNumber = modifiedSudoku.charAt(position);
+	drawMap(context, modifiedSudoku, selectedNumber);
+	drawHighlightNumber(context, position, selectedNumber);
+}
+
+function drawHighlightNumber(context, position, number) {
 	drawBackground(context, position,"#FFFFCC");
-	drawNumber(context, position, 
-		modifiedSudoku.charAt(position),
-		getTextColorByPositon(position));
+	drawNumber(context, position, number,getTextColorByPositon(position));
 }
 
 function parsePostion(x , y) {
