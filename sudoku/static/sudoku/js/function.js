@@ -25,7 +25,7 @@ $(document).ready(function() {
 		drawLine(context, i * 69, 0, i * 69, 621);
 	}
 
-	$.get("/sudoku/puzzle",function(puzzle) {
+	$.get("./puzzle/",function(puzzle) {
 		sudokuData = puzzle;
 		modifiedSudoku = new String(puzzle);
 		for(i = 0; i < 81; i++) {
